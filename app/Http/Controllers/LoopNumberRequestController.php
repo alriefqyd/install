@@ -25,7 +25,7 @@ class LoopNumberRequestController extends Controller
 {
     public function index(){
         $engineers = Engineers::all();
-        return view('LoopNumber.requestForm', [
+        return view('LoopNumber.RequestForm', [
             'engineers' => $engineers,
         ]);
     }
