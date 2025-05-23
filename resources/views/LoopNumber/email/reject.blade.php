@@ -28,7 +28,9 @@
                 </tr>
                 <tr>
                     <td style="font-size: 16px; padding-bottom: 30px;">
-                        {{$data->remarks}}
+                        @foreach($data->remarks as $remark)
+                            - {{$remark}} <br>
+                        @endforeach
                     </td>
                 </tr>
                 <tr>
