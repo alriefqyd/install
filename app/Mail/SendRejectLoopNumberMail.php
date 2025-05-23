@@ -38,7 +38,7 @@ class SendRejectLoopNumberMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'loopNumber.email.reject',
+            view: 'LoopNumber.email.reject',
             with: [
                 'data' => $this->data,
                 'requestor' => $this->requestor->name,

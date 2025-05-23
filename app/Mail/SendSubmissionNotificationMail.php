@@ -41,7 +41,7 @@ class SendSubmissionNotificationMail extends Mailable
     {
         $requestor = Engineers::where('id', $this->data->engineers_id)->first()->name;
         return new Content(
-            view: 'loopNumber.email.success',
+            view: 'LoopNumber.email.success',
             with: [
                 'data' => $this->data,
                 'requestor' => $requestor,

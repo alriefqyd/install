@@ -40,7 +40,7 @@ class SendApprovedLoopNumberMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'loopNumber.email.approved',
+            view: 'LoopNumber.email.approved',
             with: [
                 'data' => $this->data,
                 'requestor' => $this->requestor->name,
