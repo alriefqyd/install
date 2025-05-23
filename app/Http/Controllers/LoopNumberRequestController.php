@@ -25,7 +25,7 @@ class LoopNumberRequestController extends Controller
 {
     public function index(){
         $engineers = Engineers::all();
-        return view('loopNumber/requestForm', [
+        return view('loopNumber.requestForm', [
             'engineers' => $engineers,
         ]);
     }
@@ -114,7 +114,7 @@ class LoopNumberRequestController extends Controller
 
     public function success()
     {
-        return view('loopNumber/success');
+        return view('loopNumber.success');
     }
 
     private function deleteDocument($document, $path){
