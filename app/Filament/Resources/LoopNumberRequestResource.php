@@ -78,18 +78,26 @@ class LoopNumberRequestResource extends Resource
                 'reject' => 'Reject',
                 'pending' => 'Pending'
             ])->label('Status')->reactive(),
-            Forms\Components\Select::make('services_id')->options(function () {
-                return Service::all()->pluck('name', 'id');
-            })->searchable()->columnSpan('full'),
-            Forms\Components\Textarea::make('remarks')->columnSpan('full')
+            Forms\Components\Select::make('remarks')->columnSpan('full')
                 ->label('Reason for Rejection')
-                ->rows(3)
+                ->options([
+                    'Upload the P&ID drawing' => 'Upload the P&ID drawing',
+                    'Mark the instruments on the P&ID drawing and re-upload' => 'Mark the instruments on the P&ID drawing and re-upload',
+                    'Mark and upload the HMI screenshot' => 'Mark and upload the HMI screenshot'
+                ])->searchable()->multiple()
                 ->required(fn ($get) => $get('status') === 'reject')
                 ->visible(fn ($get) => $get('status') === 'reject'),
+            Forms\Components\Select::make('services_id')->options(function () {
+                return Service::all()->pluck('name', 'id');
+            })->searchable()->columnSpan('full')
+                ->required(fn ($get) => $get('status') === 'approve')
+                ->visible(fn ($get) => $get('status') === 'approve'),
             Forms\Components\Repeater::make('loop_number')
                 ->schema([
                     TextInput::make('loop_number')->required(),
                 ])->defaultItems(2)->columnSpan('full')
+                ->required(fn ($get) => $get('status') === 'approve')
+                ->visible(fn ($get) => $get('status') === 'approve')
         ]);
 
     }
