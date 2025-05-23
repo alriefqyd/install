@@ -25,7 +25,7 @@ class LoopNumberRequestController extends Controller
 {
     public function index(){
         $engineers = Engineers::all();
-        return view('loopNumber.requestForm', [
+        return view('LoopNumber.requestForm', [
             'engineers' => $engineers,
         ]);
     }
@@ -89,7 +89,7 @@ class LoopNumberRequestController extends Controller
         $instrumentIndex = InstrumentIndex::where('session_id', $request->sessionId)->get();
         $service = Service::all();
         $dev = DevModel::all();
-        return view('loopNumber.editForm', [
+        return view('LoopNumber.editForm', [
             'instrumentIndex' => $instrumentIndex,
             'services' => $service,
             'dev' => $dev
@@ -114,7 +114,7 @@ class LoopNumberRequestController extends Controller
 
     public function success()
     {
-        return view('loopNumber.success');
+        return view('LoopNumber.success');
     }
 
     private function deleteDocument($document, $path){
