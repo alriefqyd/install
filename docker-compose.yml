@@ -22,7 +22,7 @@ services:
         volumes:
             - ./mysql/data:/var/lib/mysql
         environment:
-            - MYSQL_DATABASE=risk_ranking
+            - MYSQL_DATABASE=instrument_index
             - MYSQL_ROOT_PASSWORD=password
         networks:
             - app-network

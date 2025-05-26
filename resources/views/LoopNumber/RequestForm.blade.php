@@ -12,7 +12,7 @@
         <div class="flex items-center justify-center space-x-4 mb-1">
             <h1 class="text-4xl text-white font-bold">Request Loop Number</h1>
         </div>
-        <p class="text-lg text-teal-100">Submit new loop numbers, manage requests, and streamline operations from one place.</p>
+        <p class="text-lg text-teal-100">Hello instrument engineers, please submit a loop number request for all your needs.</p>
     </div>
 
     <!-- Category Selection -->

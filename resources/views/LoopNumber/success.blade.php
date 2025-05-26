@@ -22,9 +22,9 @@
     <!-- Illustration -->
     <img src="{{asset('/images/success.png')}}" alt="Illustration" class="mx-auto mb-6 w-40 h-auto">
 
-    <a href="/">
+    <a href="/request-loop-no">
     <button class="bg-teal-600 text-white px-6 py-2 rounded-full hover:bg-teal-700 transition">
-        Back to Dashboard
+        Back to Form
     </button>
     </a>
 </div>

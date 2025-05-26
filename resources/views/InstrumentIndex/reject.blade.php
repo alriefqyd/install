@@ -11,8 +11,8 @@
             <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                 <tr>
                     <td align="center" style="padding-bottom: 20px;">
-                        <div style="width: 60px; height: 60px; background-color: #0f766e; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                            <span style="font-size: 32px; color: white;">✓</span>
+                        <div style="width: 60px; height: 60px; background-color: red; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <span style="font-size: 32px; color: white;">x</span>
                         </div>
                     </td>
                 </tr>
@@ -23,20 +23,13 @@
                 </tr>
                 <tr>
                     <td style="font-size: 16px; color: #444444; padding-bottom: 20px;">
-                        Your loop number request has been <strong>approved</strong>. Please use the following Loop Number:
+                        Your Instrument Index update has been rejected due to some issues.
+                        Please check the remarks and make the necessary corrections by clicking <a href="{{url('/admin/update-instrument-index/'. $data->session_id)}}"> here </a>
                     </td>
                 </tr>
                 <tr>
-                    <td align="center" style="font-size: 32px; font-weight: bold; color: #0f766e; padding-bottom: 30px;">
-                        @foreach($data->loop_number as $k=>$v)
-                            {{$v['loop_number']}} <br>
-                        @endforeach
-
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-size: 16px; color: #444444; padding-bottom: 30px;">
-                        Please be informed that you must complete the required information on the Instrument Index <a href="{{url('update-instrument-index/'.$sessionId)}}">here </a> once you have successfully commissioned the instruments.
+                    <td style="font-size: 16px; padding-bottom: 30px;">
+                        {{$data->remark_updated}}
                     </td>
                 </tr>
                 <tr>

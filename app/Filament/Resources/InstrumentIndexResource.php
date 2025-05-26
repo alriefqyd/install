@@ -4,14 +4,19 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\InstrumentIndexResource\Pages;
 use App\Filament\Resources\InstrumentIndexResource\RelationManagers;
+use App\Models\DevModel;
 use App\Models\InstrumentIndex;
+use App\Models\LoopNumberRequest;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Services\InstrumentIndexService;
+use Illuminate\Support\Facades\Mail;
 
 class InstrumentIndexResource extends Resource
 {
@@ -23,17 +28,17 @@ class InstrumentIndexResource extends Resource
     {
         return $form
             ->schema([
-//                Select::make('dev')->options(function () {
-//                    return Setting::where('setting_type', 'DEV_CODE')->pluck('setting_name', 'setting_value')->toArray();
-//                })->reactive()
-//                    ->afterStateUpdated(function (callable $set, callable $get) {
-//                        $code = app(InstrumentIndexService::class)->generateLoopNo(
-//                            $get('dev'),
-//                            $get('area_id'),
-//                            $get('service_id')
-//                        );
-//                        $set('code', $code);
-//                    }),
+                Select::make('dev')->options(function () {
+                    DevModel::all()->pluck('description', 'code')->toArray();
+                })->reactive()
+                    ->afterStateUpdated(function (callable $set, callable $get) {
+                        $code = app(InstrumentIndexService::class)->generateLoopNo(
+                            $get('dev'),
+                            $get('area_id'),
+                            $get('service_id')
+                        );
+                        $set('code', $code);
+                    }),
                 Select::make('area_id')
                     ->label('Area')
                     ->options(\App\Models\Area::where('type', 'SUB_AREA')->pluck('name', 'id'))
@@ -73,11 +78,19 @@ class InstrumentIndexResource extends Resource
                 TextInput::make('model')->label('Model'),
                 TextInput::make('range_unit')->label('Range Unit'),
                 TextInput::make('outsignal')->label('Outsignal'),
+                TextInput::make('supply')->label('supply'),
                 TextInput::make('loop_drwg')->label('Loop Drawing'),
                 TextInput::make('spec_no')->label('Spec No'),
                 TextInput::make('pr_mr_no')->label('PR / MR No'),
-                TextInput::make('remark')->label('remark'),
-                TextInput::make('supply')->label('supply'),
+                Textarea::make('remark')->label('remark')->columnSpanFull(),
+                Radio::make('status_updated')->label('Status')->options([
+                    'pending' => 'Pending',
+                    'approve' => 'Approve',
+                    'reject' => 'Reject',
+                ])->reactive(),
+                TextArea::make('remark_updated')->label('Reason For Rejected')->columnSpanFull()
+                    ->required(fn ($get) => $get('status_updated') === 'reject')
+                    ->visible(fn ($get) => $get('status_updated') === 'reject'),
             ]);
     }
 
@@ -85,22 +98,79 @@ class InstrumentIndexResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code'),
-                Tables\Columns\TextColumn::make('pid_drawing'),
-                Tables\Columns\TextColumn::make('device_description'),
-                Tables\Columns\TextColumn::make('manufacturer'),
-                Tables\Columns\TextColumn::make('model'),
-                Tables\Columns\TextColumn::make('range_unit'),
-                Tables\Columns\TextColumn::make('outsignal'),
-                Tables\Columns\TextColumn::make('loop_drwg'),
-
+                Tables\Columns\TextColumn::make('dev'),
+                Tables\Columns\TextColumn::make('code')->label('Loop No'),
+                Tables\Columns\TextColumn::make('services.name')->label('Service'),
+                Tables\Columns\TextColumn::make('pid_drawing')->label('P&ID Drawing'),
+                Tables\Columns\TextColumn::make('device_description')->label('Device Description'),
+                Tables\Columns\TextColumn::make('manufacturer')->label('Manufacturer'),
+                Tables\Columns\TextColumn::make('model')->label('Model/Element Type'),
+                Tables\Columns\TextColumn::make('range_unit')->label('Range Unit'),
+                Tables\Columns\TextColumn::make('outsignal')->label('Outsignal'),
+                Tables\Columns\TextColumn::make('supply')->label('Supply'),
+                Tables\Columns\TextColumn::make('loop_drwg')->label('Loop Drawing'),
+                Tables\Columns\TextColumn::make('spec_no')->label('Spec No'),
+                Tables\Columns\TextColumn::make('po_mr_no')->label('PR / MR No'),
+                Tables\Columns\TextColumn::make('remark')->label('Remark'),
+                Tables\Columns\TextColumn::make('status_updated')->label('Status'),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status_updated')->options([
+                    'pending' => 'Pending',
+                    'approve' => 'Approve',
+                    'reject' => 'Reject',
+                ])->label('Status'),
+                Tables\Filters\Filter::make('ticket_number')
+                    ->form([
+                        TextInput::make('value')
+                            ->label('Search Ticket Number'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when($data['value'],
+                                fn ($query, $value) => $query->where('ticket_number', 'like', "%{$value}%")
+                            );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+
+                Tables\Actions\Action::make('updateStatus')
+                    ->label('Update Status')
+                    ->icon('heroicon-o-pencil-square')
+                    ->form([
+                        Select::make('status_updated')
+                            ->label('Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'approve' => 'Approve',
+                                'reject' => 'Reject',
+                            ])
+                            ->required()
+                            ->reactive(),
+
+                        Textarea::make('remark_updated')
+                            ->label('Reason for Rejection')
+                            ->requiredIf('status_updated', 'reject')
+                            ->visible(fn ($get) => $get('status_updated') === 'reject'),
+                    ])->action(function ($record, array $data) {
+                        $record->update([
+                            'status_updated' => $data['status_updated'],
+                            'remark_updated' => $data['remark_updated'] ?? null,
+                        ]);
+
+                        $loopNumberRequest = LoopNumberRequest::with('engineers')->where('id', $record->loop_number_requests_id)->first();
+                        if (in_array($data['status_updated'], ['approve', 'reject'])) {
+                            Mail::to($loopNumberRequest->engineers?->email) // replace with dynamic email if needed
+                            ->send(new \App\Mail\StatusUpdatedMail($record, $loopNumberRequest));
+                        }
+
+                    })
+                    ->modalHeading('Update Status')
+                    ->modalSubheading('Rejecting requires a reason.')
+                    ->requiresConfirmation(true),
             ])
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

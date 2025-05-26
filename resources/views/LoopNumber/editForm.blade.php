@@ -28,84 +28,86 @@
         <!-- Tabs -->
         <div class="w-full max-w-7xl mx-auto">
             <div class="bg-white p-10 rounded-2xl shadow-xl mb-10 flex">
-                @if(sizeof($instrumentIndex) > 0)
+                @if(sizeof($instrumentIndex->loop_number) > 0)
                     <!-- Vertical Tab Buttons (Sidebar) -->
                     <div class="flex flex-col gap-2 w-60 pr-6 border-r border-gray-200">
-                        @foreach($instrumentIndex as $idx)
-                            <button class="tab-btn px-4 py-2 rounded-md border border-gray-300 bg-white shadow-sm hover:bg-teal-50 hover:text-teal-700 {{$loop->index == 0 ? 'active-tab' : ''}}" data-tab="{{$idx->id}}">Loop No <span class="text-yellow-400"> {{$idx->code}} </span></button>
+                        <div class="px-4 py-2 rounded-md border border-gray-300 bg-yellow-400 text-white shadow-sm hover:bg-teal-50 text-weight-10 hover:text-teal-700" disabled="disabled"> AREA : {{$instrumentIndex[0]->areas->name ?? "N/A"}} </div>
+                        @foreach($instrumentIndex->loop_number as $idx)
+                            <button class="tab-btn px-4 py-2 rounded-md border border-gray-300 bg-white shadow-sm hover:bg-teal-50 hover:text-teal-700 {{$loop->index == 0 ? 'active-tab' : ''}}" data-tab="{{$idx['loop_number']}}">Loop No <span class="text-yellow-400"> {{$idx['loop_number']}} </span></button>
                         @endforeach
                     </div>
 
                     <!-- Tab Contents -->
                     <div class="flex-1 pl-6">
-                        @foreach($instrumentIndex as $idx)
-                        <div class="tab-content {{$loop->index >0 ? "hidden" : ""}}" id="{{$idx->id}}" >
+                        @foreach($instrumentIndex->loop_number as $idx)
+                        <div class="tab-content {{$loop->index > 0 ? "hidden" : ""}}" id="{{$idx['loop_number']}}" >
                             <form action="" method="POST" enctype="multipart/form-data" class="flex-1 pl-6">
                                 @csrf
-                                <input type="hidden" class="js-id-instrument_index" name="id" value="{{$idx->id}}">
+                                <input type="hidden" class="js-id-instrument_index" name="id" value="{{$instrumentIndex->id}}">
+                                <input type="hidden" class="js-area_id" name="id" value="{{$instrumentIndex->areas?->id}}">
+                                <input type="hidden" class="js-ticket" name="id" value="{{$instrumentIndex->ticket_number}}">
                                 <!-- Device Info -->
-                                <fieldset>
-                                    <legend>Device Info</legend>
-                                    <div class="form-group">
-                                        <div class="form-field"><label for="dev">DEV</label>
-                                            <select name="dev" id="#mySelect" class="w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
-                                                @foreach($dev as $a)
-                                                    <option {{$a->code == $idx->dev ? 'selected' : ''}} value="{{$a->code}}">[{{$a->code}}]-{{$a->description}}</option>
-                                                @endforeach
-                                            </select>
+
+                                    <fieldset>
+                                        <legend>Loop No & Service</legend>
+                                        <div class="form-group">
+                                            <div class="form-field"><label for="loop_no">Loop No</label><input type="text" class="js_loop_no" name="loop_no" value="{{$idx['loop_number']}}"/></div>
+                                            <div class="form-field"><label for="service">Service</label>
+                                                <select name="service_id" class="js-service_id w-full px-4 py-2 border border-teal-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+                                                    @foreach($services as $a)
+                                                        <option {{$a->id == $instrumentIndex->services_id ? 'selected' : ''}} value="{{$a->id}}">{{$a->name}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="form-field"><label for="pid_dwg">P&ID Drawing</label><input type="text" class="js_pid_dwg" value="{{$instrumentIndex->instruments[0]?->pid_drawing ?? ""}}" name="pid_dwg" /></div>
                                         </div>
-                                        <div class="form-field"><label for="loop_no">Loop No</label><input type="text" class="js_loop_no" name="loop_no" value="{{$idx->code}}"/></div>
-                                        <div class="form-field"><label for="service">Service</label>
-                                            <select name="area_id" class="w-full px-4 py-2 border border-teal-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
-                                                @foreach($services as $a)
-                                                    <option {{$a->id == $idx->service_id ? 'selected' : ''}} value="{{$a->id}}">{{$a->name}}</option>
-                                                @endforeach
-                                            </select>
+                                    </fieldset>
+
+                                    <span class="js-temp-dev-here">
+                                    @foreach($instrumentIndex->instruments->where('code',$idx['loop_number']) as $instrument)
+                                        <fieldset>
+                                        <legend>Device Info</legend>
+                                        <input type="hidden" value="{{$instrument->id}}" class="js-id-instrument">
+                                        <div class="float-end m-2 text-red-500"><button class="js-btn-delete-dev-info">Delete</button></div>
+                                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
+                                            <div class="form-group">
+                                                <label class="float-left" for="dev">DEV</label>
+                                                <select name="dev" id="#mySelect"
+                                                        class="js-select-dev w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                                        required>
+                                                    @foreach($dev as $a)
+                                                        <option data-description="{{$a->description}}" {{$a->code == $instrument->dev ? 'selected' : ''}} value="{{$a->code}}">
+                                                            {{$a->code}}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="form-field"><label for="device_descrp">Device Description</label><input type="text" class="js_device_descrp" value="{{$instrument->device_description}}" name="device_descrp" /></div>
+                                                <div class="form-field"><label for="manufacturer">Manufacturer</label><input type="text" class="js_manufacturer" value="{{$instrument->manufacturer}}" name="manufacturer" /></div>
+                                                <div class="form-field"><label for="model_type">Model/Element Type</label><input type="text" class="js_model_type" value="{{$instrument->model}}" name="model_type" /></div>
+                                                <div class="form-field"><label for="range_unit">Range/Unit</label><input type="text" class="js_range_unit" value="{{$instrument->range_unit}}" name="range_unit" /></div>
+                                                <div class="form-field"><label for="outsignl">Output Signal</label><input type="text" value="{{$instrument->outsignal}}" class="js_outsignl" name="outsignl" /></div>
+                                                <div class="form-field w-full"><label for="supply">Supply</label><input class="js-supply" type="text" value="{{$instrument->supply}}" name="supply"/></div>
+                                                <div class="form-field"><label for="loop_dwg">Loop Drawing</label><input type="text" value="{{$instrument->loop_drwg}}" class="js_loop_dwg" name="loop_dwg" /></div>
+                                                <div class="form-field"><label for="spec_no">Spec No</label><input type="text" value="{{$instrument->spec_no}}" class="js_spec_no" name="spec_no" /></div>
+                                                <div class="form-field"><label for="po_mr_no">PO/MR No</label><input type="text" value="{{$instrument->po_mr_no}}" class="js_po_mr_no" name="po_mr_no" /></div>
+                                                <div class="form-field w-full"><label for="remark">Remark</label><textarea class="js-remark p-2" name="remark" rows="4">{!! $instrument->remark !!}</textarea></div>
+                                            </div>
                                         </div>
-                                        <div class="form-field"><label for="pid_dwg">P&ID Drawing</label><input type="text" class="js_pid_dwg" value="{{$idx->pid_drawing}}" name="pid_dwg" /></div>
-                                    </div>
-                                </fieldset>
+                                    </fieldset>
+                                @endforeach
+                                </span>
                                 <fieldset>
-                                    <legend>Specifications</legend>
-                                    <div class="form-group">
-                                        <div class="form-field"><label for="device_descrp">Device Description</label><input type="text" class="js_device_descrp" value="{{$idx->device_description}}" name="device_descrp" /></div>
-                                        <div class="form-field"><label for="manufacturer">Manufacturer</label><input type="text" class="js_manufacturer" value="{{$idx->manufacturer}}" name="manufacturer" /></div>
-                                        <div class="form-field"><label for="model_type">Model/Element Type</label><input type="text" class="js_model_type" value="{{$idx->model}}" name="model_type" /></div>
-                                        <div class="form-field"><label for="range_unit">Range/Unit</label><input type="text" class="js_range_unit" value="{{$idx->range_unit}}" name="range_unit" /></div>
+                                    <div class="mt-4">
+                                        <button type="button" id="add-dev-btn" class="px-2 py-1 rounded-md bg-yellow-500 text-white hover:bg-yellow-600">
+                                            + Add New Device
+                                        </button>
                                     </div>
                                 </fieldset>
-                                <!-- Signal and Drawing -->
-                                <fieldset>
-                                    <legend>Signal & Loop Drawing</legend>
-                                    <div class="form-group">
-                                        <div class="form-field"><label for="outsignl">Output Signal</label><input type="text" value="{{$idx->outsignal}}" class="js_outsignl" name="outsignl" /></div>
-                                        <div class="form-field w-full"><label for="supply">Supply</label><input class="js-supply" type="text" value="{{$idx->supply ?? ""}}" name="supply"/></div>
-                                        <div class="form-field"><label for="loop_dwg">Loop Drawing</label><input type="text" value="{{$idx->loop_drwg}}" class="js_loop_dwg" name="loop_dwg" /></div>
-                                    </div>
-                                </fieldset>
-
-                                <!-- Procurement -->
-                                <fieldset>
-                                    <legend>Procurement Info</legend>
-                                    <div class="form-group">
-                                        <div class="form-field"><label for="spec_no">Spec No</label><input type="text" value="{{$idx->spec_no}}" class="js_spec_no" name="spec_no" /></div>
-                                        <div class="form-field"><label for="po_mr_no">PO/MR No</label><input type="text" value="{{$idx->po_mr_no}}" class="js_po_mr_no" name="po_mr_no" /></div>
-                                    </div>
-                                </fieldset>
-
-                                <!-- Remarks -->
-                                <fieldset>
-                                    <legend>Remarks</legend>
-                                    <div class="form-group">
-                                        <div class="form-field w-full"><label for="remark">Remark</label><textarea class="js-remark p-2" name="remark" rows="4">{{$idx->remark}}</textarea></div>
-                                    </div>
-                                </fieldset>
-
                                 <!-- Other fieldsets (Specifications, Signal, etc.) go here -->
-                                <div class="submit-btn float-end">
+                                <div class="submit-btn float-end ml-1">
                                     <button
                                         type="submit"
-                                        id="submitBtnRequestUpdate"
+                                        id="finalizeInstrumentIndex"
                                         class="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-teal-700 text-white font-semibold hover:bg-teal-800 disabled:opacity-50"
                                     >
                                         <svg
@@ -129,7 +131,37 @@
                                                 d="M4 12a8 8 0 018-8v8H4z"
                                             ></path>
                                         </svg>
-                                        <span class="btn-title"> Submit Request</span>
+                                        <span class="btn-title"> Finalize Instrument Index</span>
+                                    </button>
+                                </div>
+                                <div class="submit-btn float-end">
+                                    <button
+                                        type="submit"
+                                        id="submitBtnRequestUpdate"
+                                        class="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-400 disabled:opacity-50"
+                                    >
+                                        <svg
+                                            id="spinner"
+                                            class="w-4 h-4 animate-spin text-white hidden"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                class="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                stroke-width="4"
+                                            ></circle>
+                                            <path
+                                                class="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v8H4z"
+                                            ></path>
+                                        </svg>
+                                        <span class="btn-title"> Save Instrument Index</span>
                                     </button>
                                 </div>
                             </form>

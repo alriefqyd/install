@@ -30,8 +30,8 @@ class LoopNumberRequestResource extends Resource
     {
         return $form->schema([
             Forms\Components\Select::make('area_id')->options(function (){
-                return Area::where('type','AREA')->pluck('name', 'id');
-            }),
+                return Area::where('type','SUB_AREA')->pluck('name', 'id');
+            })->label('Sub Area'),
             Forms\Components\Select::make('engineers_id')
                 ->label('Engineer')
                 ->options(function () {

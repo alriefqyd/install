@@ -22,4 +22,8 @@ class LoopNumberRequest extends Model
     public function services(){
         return $this->hasOne(Service::class , 'id' , 'services_id');
     }
+
+    public function instruments(){
+        return $this->hasMany(InstrumentIndex::class , 'loop_number_requests_id' , 'id');
+    }
 }

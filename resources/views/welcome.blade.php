@@ -20,7 +20,7 @@
         <div class="w-full lg:w-1/2 flex flex-col justify-center h-full px-7 lg:px-16 text-[#f9f1df]">
             <h1 class="text-3xl mb-12 font-extrabold drop-shadow-sm">INSTALL (Instrument Index For All)</h1>
             <p class="text-lg mb-6 mt-6 text-[#0f4f49] max-w-md leading-relaxed">
-                Choose your action below to manage loop numbers and instrument indexes efficiently.
+                Choose your action below to request loop numbers or manage instrument indexes.
             </p>
 
             <div class="flex gap-4 flex-wrap">

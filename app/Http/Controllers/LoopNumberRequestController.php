@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SendSubmissionNotificationMail;
+use App\Mail\SendUpdateNotificationEmail;
 use App\Mail\SubmissionNotificationEmail;
 use App\Models\Area;
 use App\Models\DevModel;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Exception;
+use Psy\Util\Json;
 
 class LoopNumberRequestController extends Controller
 {
@@ -60,20 +62,33 @@ class LoopNumberRequestController extends Controller
     public function update(Request $request){
         try {
             DB::beginTransaction();
-            $instrumentIndex = InstrumentIndex::where('id', $request->id)->first();
-            $instrumentIndex->pid_drawing = $request->pid_drawing;
-            $instrumentIndex->device_description = $request->device_description;
-            $instrumentIndex->manufacturer = $request->manufacturer;
-            $instrumentIndex->model = $request->model;
-            $instrumentIndex->range_unit = $request->range_unit;
-            $instrumentIndex->outsignal = $request->outsignal;
-            $instrumentIndex->loop_drwg = $request->loop_drwg;
-            $instrumentIndex->spec_no = $request->spec_no;
-            $instrumentIndex->po_mr_no = $request->po_mr_no;
-            $instrumentIndex->remark = $request->remark;
-            $instrumentIndex->supply = $request->supply;
-            $instrumentIndex->dev = $request->dev;
-            $instrumentIndex->save();
+            foreach ($request->devices as $device) {
+                $instrumentIndex = new InstrumentIndex();
+                if(isset($device['instrument'])){
+                    $instrumentIndex = InstrumentIndex::where('id', $device['instrument'])->first();
+                }
+                $instrumentIndex->pid_drawing = $request->pid_drawing;
+                $instrumentIndex->loop_number = $request->loop_no;
+                $instrumentIndex->service_id = $request->service_id;
+                $instrumentIndex->area_id = $request->area;
+                $instrumentIndex->device_description = $device['device_descrp'];
+                $instrumentIndex->manufacturer = $device['manufacturer'];
+                $instrumentIndex->model = $device['model_type'];
+                $instrumentIndex->range_unit = $device['range_unit'];
+                $instrumentIndex->outsignal = $device['outsignl'];
+                $instrumentIndex->loop_drwg = $device['loop_dwg'];
+                $instrumentIndex->spec_no = $device['spec_no'];
+                $instrumentIndex->po_mr_no = $device['po_mr_no'];
+                $instrumentIndex->remark = $device['remark'];
+                $instrumentIndex->supply = $device['supply'];
+                $instrumentIndex->dev = $device['dev'];
+                $instrumentIndex->code = $request->loop_no;
+                $instrumentIndex->loop_number_requests_id = $request->id;
+                $instrumentIndex->ticket_number = $request->ticket_number;
+                $instrumentIndex->save();
+            }
+
+            //$this->sendEmailUpdateNotification($instrumentIndex);
             DB::commit();
             return response()->json(['success' => 'Successfully updated'], 200);
         } catch (\Exception $e) {
@@ -86,14 +101,36 @@ class LoopNumberRequestController extends Controller
 
     public function edit(Request $request)
     {
-        $instrumentIndex = InstrumentIndex::where('session_id', $request->sessionId)->get();
+        $loopNumberRequest = LoopNumberRequest::with(['areas','instruments'])->where('session_id', $request->sessionId)->first();
+        $loopNumbers = $loopNumberRequest->loop_number;
         $service = Service::all();
         $dev = DevModel::all();
+        $area = Area::where('type','AREA')->get();
+        $subArea = Area::where('type','SUB_AREA')->get();
         return view('LoopNumber.editForm', [
-            'instrumentIndex' => $instrumentIndex,
+            'instrumentIndex' => $loopNumberRequest,
+            'loopNumbers' => $loopNumbers,
             'services' => $service,
-            'dev' => $dev
+            'dev' => $dev,
+            'area' => $area,
+            'subArea' => $subArea,
         ]);
+    }
+
+    public function finalize(Request $request){
+        try{
+            DB::beginTransaction();
+            $instruments = InstrumentIndex::where('ticket_number', $request->ticket)->get();
+            foreach ($instruments as $instrument) {
+                $instrument->is_finalize = 1;
+                $instrument->save();
+            }
+            $this->sendEmailUpdateNotification($instruments[0]);
+            DB::commit();
+        } catch (\Exception $e){
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function uploadDocument(Request $request,$file, $allowedFileExtension){
@@ -124,11 +161,17 @@ class LoopNumberRequestController extends Controller
         }
     }
 
+    public function getDataDev()
+    {
+        $data = DevModel::all();
+        return response()->json($data);
+    }
+
     private function sendEmailSubmitNotification(LoopNumberRequest $requstLoop){
         if(isset($requstLoop->id)){
             try{
-                Mail::to("c0661472@vale.com")->send(new SendSubmissionNotificationMail($requstLoop));
-                Log::info('Email send to : elfriani@vale.com');
+                Mail::to("fathur.miftahudin@vale.com")->send(new SendSubmissionNotificationMail($requstLoop));
+                Log::info('Email send to : fathur');
             } catch (Exception $e){
                 Log::error($e->getMessage());
             }
@@ -136,4 +179,18 @@ class LoopNumberRequestController extends Controller
             Log::warning("No email found");
         }
     }
+
+    private function sendEmailUpdateNotification(InstrumentIndex $instrumentIndex){
+        if(isset($instrumentIndex->id)){
+            try{
+                Mail::to("fathur.miftahudin@vale.com")->send(new SendUpdateNotificationEmail($instrumentIndex));
+                Log::info('Email send to : fathur.miftahudin@vale.com');
+            } catch (Exception $e){
+                Log::error($e->getMessage());
+            }
+        } else {
+            Log::warning("No email found");
+        }
+    }
+
 }

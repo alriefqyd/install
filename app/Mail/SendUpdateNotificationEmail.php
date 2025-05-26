@@ -3,15 +3,15 @@
 namespace App\Mail;
 
 use App\Models\Engineers;
+use App\Models\LoopNumberRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendSubmissionNotificationMail extends Mailable
+class SendUpdateNotificationEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -21,6 +21,9 @@ class SendSubmissionNotificationMail extends Mailable
     public function __construct($data)
     {
         $this->data = $data;
+        $requestLoop = LoopNumberRequest::with('engineers')->where('id', $data->loop_number_requests_id)->first();
+        $this->engineers = $requestLoop->engineers;
+
     }
 
     /**
@@ -28,9 +31,8 @@ class SendSubmissionNotificationMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $subject = 'New Loop Number Request Submitted';
         return new Envelope(
-            subject: $subject
+            subject: 'Update Instrument Index [' . $this->data->ticket_number . ']',
         );
     }
 
@@ -39,12 +41,10 @@ class SendSubmissionNotificationMail extends Mailable
      */
     public function content(): Content
     {
-        $requestor = Engineers::where('id', $this->data->engineers_id)->first()->name ?? "";
         return new Content(
-            view: 'LoopNumber.email.success',
-            with: [
-                'data' => $this->data,
-                'requestor' => $requestor,
+            view: 'LoopNumber.email.successUpdate',with: [
+                'requestor' => $this->engineers->name,
+                'data' => $this->data
             ],
         );
     }
@@ -56,16 +56,6 @@ class SendSubmissionNotificationMail extends Mailable
      */
     public function attachments(): array
     {
-        $attachments = [
-            Attachment::fromPath(storage_path("app/public/{$this->data->p_and_id_document}"))
-                ->as(basename($this->data->p_and_id_document))
-        ];
-
-        if (!empty($this->data->hmi_document)) {
-            $attachments[] = Attachment::fromPath(storage_path("app/public/{$this->data->hmi_document}"))
-                ->as(basename($this->data->hmi_document));
-        }
-
-        return  $attachments;
+        return [];
     }
 }

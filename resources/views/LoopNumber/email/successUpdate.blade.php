@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>New Loop Number Request</title>
+    <title>Update Instrument Index</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
 <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0;">
@@ -18,12 +18,12 @@
                 </tr>
                 <tr>
                     <td align="center" style="color: #0f766e; font-size: 24px; font-weight: bold; padding-bottom: 10px;">
-                        New Loop Number Request
+                        Instrument Index Updated
                     </td>
                 </tr>
                 <tr>
                     <td align="center" style="color: #444444; font-size: 16px; padding-bottom: 20px;">
-                        A new loop number request has been submitted by <strong>{{ $requestor ?? "" }}</strong> and requires your review.
+                        An updated instrument index has been submitted by AL and requires your review <strong>{{ $requestor }}</strong> and requires your review.
                     </td>
                 </tr>
                 <tr>
@@ -33,7 +33,7 @@
                 </tr>
                 <tr>
                     <td align="center">
-                        <a href="{{url('/admin/loop-number-requests/'.$data->id . '/edit')}}" style="background-color: #0f766e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 999px; font-size: 16px;">
+                        <a href="{{url('/admin/instrument-indices/?tableFilters[ticket_number][value]='.$data->ticket_number)}}" style="background-color: #0f766e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 999px; font-size: 16px;">
                             Review Now
                         </a>
                     </td>

@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Engineers;
+use App\Models\InstrumentIndex;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,19 +10,17 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendApprovedLoopNumberMail extends Mailable
+class StatusUpdatedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($data, $requestor, $sessionId, $ticket)
+    public function __construct(InstrumentIndex $instrumentIndex, $requestor)
     {
-        $this->data = $data;
+        $this->instrumentIndex = $instrumentIndex;
         $this->requestor = $requestor;
-        $this->sessionId = $sessionId;
-        $this->ticket = $ticket;
     }
 
     /**
@@ -31,7 +29,7 @@ class SendApprovedLoopNumberMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Loop Number Approved ['.$this->ticket.']',
+            subject: 'Instrument Index '. $this->instrumentIndex->status_updated,
         );
     }
 
@@ -41,11 +39,10 @@ class SendApprovedLoopNumberMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'LoopNumber.email.approved',
+            view: 'InstrumentIndex.StatusUpdatedMail',
             with: [
-                'data' => $this->data,
-                'requestor' => $this->requestor->name,
-                'sessionId' => $this->sessionId,
+                'instrumentIndex' => $this->instrumentIndex,
+                'requestor' => $this->requestor,
             ]
         );
     }
