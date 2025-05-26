@@ -7,6 +7,7 @@ use App\Filament\Resources\InstrumentIndexResource\RelationManagers;
 use App\Models\DevModel;
 use App\Models\InstrumentIndex;
 use App\Models\LoopNumberRequest;
+use App\Models\Setting;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -28,16 +29,27 @@ class InstrumentIndexResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('dev')->options(function () {
-                    DevModel::all()->pluck('description', 'code')->toArray();
-                })->reactive()
-                    ->afterStateUpdated(function (callable $set, callable $get) {
+                Select::make('dev')
+                    ->options(function () {
+                        return DevModel::all()->pluck('description', 'code')->toArray();
+                    })
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, callable $get, $state) {
+                        // Set the generated loop number
                         $code = app(InstrumentIndexService::class)->generateLoopNo(
-                            $get('dev'),
+                            $state, // This is the selected 'dev' code
                             $get('area_id'),
                             $get('service_id')
                         );
                         $set('code', $code);
+
+                        // Fetch and set the device description
+                        $dev = \App\Models\DevModel::where('code', $state)->first();
+                        if ($dev) {
+                            $set('device_description', $dev->description);
+                        } else {
+                            $set('device_description', null);
+                        }
                     }),
                 Select::make('area_id')
                     ->label('Area')
@@ -74,11 +86,17 @@ class InstrumentIndexResource extends Resource
                     ->label('Code'),
                 TextInput::make('pid_drawing')->label('P&ID Drawing'),
                 TextInput::make('device_description')->label('Device Description'),
-                TextInput::make('manufacturer')->label('Manufacturer'),
+                Select::make('manufacturer')->options(function () {
+                    return Setting::where('setting_type','MANUFACTURER')->pluck('setting_value', 'setting_name')->toArray();
+                }),
                 TextInput::make('model')->label('Model'),
                 TextInput::make('range_unit')->label('Range Unit'),
-                TextInput::make('outsignal')->label('Outsignal'),
-                TextInput::make('supply')->label('supply'),
+                Select::make('outsignal')->options(function () {
+                    return Setting::where('setting_type','OUTSIGNAL')->pluck('setting_value', 'setting_name')->toArray();
+                }),
+                Select::make('supply')->options(function () {
+                    return Setting::where('setting_type','SUPPLY')->pluck('setting_value', 'setting_name')->toArray();
+                }),
                 TextInput::make('loop_drwg')->label('Loop Drawing'),
                 TextInput::make('spec_no')->label('Spec No'),
                 TextInput::make('pr_mr_no')->label('PR / MR No'),
