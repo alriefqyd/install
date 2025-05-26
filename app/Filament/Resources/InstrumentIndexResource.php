@@ -30,27 +30,26 @@ class InstrumentIndexResource extends Resource
         return $form
             ->schema([
                 Select::make('dev')
+                    ->label('Device Code')
                     ->options(function () {
-                        return DevModel::all()->pluck('description', 'code')->toArray();
+                        return \App\Models\DevModel::pluck('code', 'code')->toArray();
+                        // key = code, value = code
                     })
                     ->reactive()
                     ->afterStateUpdated(function (callable $set, callable $get, $state) {
-                        // Set the generated loop number
-                        $code = app(InstrumentIndexService::class)->generateLoopNo(
-                            $state, // This is the selected 'dev' code
+                        // Auto-generate loop number (code field)
+                        $generatedCode = app(\App\Services\InstrumentIndexService::class)->generateLoopNo(
+                            $state,
                             $get('area_id'),
                             $get('service_id')
                         );
-                        $set('code', $code);
+                        $set('code', $generatedCode);
 
-                        // Fetch and set the device description
+                        // Auto-populate device description
                         $dev = \App\Models\DevModel::where('code', $state)->first();
-                        if ($dev) {
-                            $set('device_description', $dev->description);
-                        } else {
-                            $set('device_description', null);
-                        }
+                        $set('device_description', $dev?->description ?? '');
                     }),
+
                 Select::make('area_id')
                     ->label('Area')
                     ->options(\App\Models\Area::where('type', 'SUB_AREA')->pluck('name', 'id'))
