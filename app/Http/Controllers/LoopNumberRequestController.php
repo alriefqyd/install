@@ -107,6 +107,9 @@ class LoopNumberRequestController extends Controller
         $dev = DevModel::all();
         $area = Area::where('type','AREA')->get();
         $subArea = Area::where('type','SUB_AREA')->get();
+        $manufacturer = Setting::where('setting_type','MANUFACTURER')->get();
+        $outsignal = Setting::where('setting_type','OUTSIGNAL')->get();
+        $supplies = Setting::where('setting_type','SUPPLY')->get();
         return view('LoopNumber.editForm', [
             'instrumentIndex' => $loopNumberRequest,
             'loopNumbers' => $loopNumbers,
@@ -114,6 +117,9 @@ class LoopNumberRequestController extends Controller
             'dev' => $dev,
             'area' => $area,
             'subArea' => $subArea,
+            'manufacturer' => $manufacturer,
+            'outsignal' => $outsignal,
+            'supplies' => $supplies,
         ]);
     }
 
@@ -164,6 +170,12 @@ class LoopNumberRequestController extends Controller
     public function getDataDev()
     {
         $data = DevModel::all();
+        return response()->json($data);
+    }
+
+    public function getDataSetting(Request $request)
+    {
+        $data = Setting::where('setting_type',$request->type)->get();
         return response()->json($data);
     }
 

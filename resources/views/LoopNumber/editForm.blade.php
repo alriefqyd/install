@@ -82,11 +82,29 @@
                                                     @endforeach
                                                 </select>
                                                 <div class="form-field"><label for="device_descrp">Device Description</label><input type="text" class="js_device_descrp" value="{{$instrument->device_description}}" name="device_descrp" /></div>
-                                                <div class="form-field"><label for="manufacturer">Manufacturer</label><input type="text" class="js_manufacturer" value="{{$instrument->manufacturer}}" name="manufacturer" /></div>
+                                                <div class="form-field"><label for="manufacturer">Manufacturer</label>
+                                                    <select class="js_manufacturer w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" name="manufacturer">
+                                                        @foreach($manufacturer as $manufactur)
+                                                            <option value="{{$manufactur->setting_value}}" {{$manufactur->setting_value == $instrument->manufacturer ? 'selected' : ''}}>{{$manufactur->setting_value}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                                 <div class="form-field"><label for="model_type">Model/Element Type</label><input type="text" class="js_model_type" value="{{$instrument->model}}" name="model_type" /></div>
                                                 <div class="form-field"><label for="range_unit">Range/Unit</label><input type="text" class="js_range_unit" value="{{$instrument->range_unit}}" name="range_unit" /></div>
-                                                <div class="form-field"><label for="outsignl">Output Signal</label><input type="text" value="{{$instrument->outsignal}}" class="js_outsignl" name="outsignl" /></div>
-                                                <div class="form-field w-full"><label for="supply">Supply</label><input class="js-supply" type="text" value="{{$instrument->supply}}" name="supply"/></div>
+                                                <div class="form-field"><label for="outsignl">Output Signal</label>
+                                                    <select class="js_outsignl w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" name="outsignl">
+                                                        @foreach($outsignal as $o)
+                                                            <option value="{{$o->setting_value}}" {{$o->setting_value == $instrument->outsignal ? 'selected' : ''}}>{{$o->setting_value}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="form-field w-full"><label for="supply">Supply</label>
+                                                    <select class="js-supply w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" name="outsignl">
+                                                        @foreach($supplies as $supply)
+                                                            <option value="{{$supply->setting_value}}" {{$supply->setting_value == $instrument->supply ? 'selected' : ''}}>{{$supply->setting_value}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                                 <div class="form-field"><label for="loop_dwg">Loop Drawing</label><input type="text" value="{{$instrument->loop_drwg}}" class="js_loop_dwg" name="loop_dwg" /></div>
                                                 <div class="form-field"><label for="spec_no">Spec No</label><input type="text" value="{{$instrument->spec_no}}" class="js_spec_no" name="spec_no" /></div>
                                                 <div class="form-field"><label for="po_mr_no">PO/MR No</label><input type="text" value="{{$instrument->po_mr_no}}" class="js_po_mr_no" name="po_mr_no" /></div>

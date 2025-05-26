@@ -88,8 +88,6 @@ $(function() {
         var _area_id = $form.find('.js-area_id').val();
         var _ticket_number = $form.find('.js-ticket').val();
 
-        console.log(_devices);
-
         $.ajax({
             url: '/instrument-index/update', // TODO: replace with your actual Laravel route
             type: 'POST',
@@ -114,6 +112,13 @@ $(function() {
                 console.error(xhr.responseText);
             }
         });
+    });
+
+    $(document).on('change', '.js-select-dev', function () {
+        var _this = $(this);
+        var selectedOption = _this.find('option:selected');
+        var _description = selectedOption.data('description'); // or .attr('data-description')
+        _this.closest('fieldset').find('.js_device_descrp').val(_description);
     });
 
     $('#closeSuccessBtn').on('click', function (e) {
@@ -143,13 +148,35 @@ $(function() {
             'dataType' : 'json',
         })
     }
+
+    function getDataSetting(_type){
+        return $.ajax({
+            'url' : '/getDataSetting',
+            'type' : 'GET',
+            'dataType' : 'json',
+            'data' : {
+                'type' : _type
+            },
+        })
+    }
+
     $(document).on('click', '#add-dev-btn', function (e) {
         e.preventDefault();
         var _this = $(this)
         var _template = $('#js-template-device-info').html()
-        getDataDev().then(function(devData) {
-            console.log(devData)
-            var data = { devOptions: devData };
+        Promise.all([
+            getDataDev(),
+            getDataSetting('OUTSIGNAL'),
+            getDataSetting('MANUFACTURER'),
+            getDataSetting('SUPPLY')// pass the type you want to fetch
+        ]).then(function([devData, outSignalData, manufacturer, supply]) {
+            var data = {
+                devOptions: devData,
+                outSignalOptions: outSignalData,
+                manufacturer: manufacturer,
+                supply: supply
+            };
+            console.log(outSignalData, devData);
             var _temp = Mustache.render(_template, data);
             $('.js-temp-dev-here').append(_temp);
         });
