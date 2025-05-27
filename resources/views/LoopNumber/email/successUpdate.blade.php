@@ -23,7 +23,7 @@
                 </tr>
                 <tr>
                     <td align="center" style="color: #444444; font-size: 16px; padding-bottom: 20px;">
-                        An updated instrument index has been submitted by AL and requires your review <strong>{{ $requestor }}</strong> and requires your review.
+                        An updated instrument index has been submitted by {{ $requestor }} and requires your review .
                     </td>
                 </tr>
                 <tr>
