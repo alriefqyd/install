@@ -64,6 +64,8 @@ $(function() {
             var _dev = __parent.find('.js_dev').val();
             var _supply = __parent.find('.js-supply').val();
             var _id = __parent.find('.js-id-instrument').val();
+            var _service_id = __parent.find('.js-service_id').val();
+
 
             _devices.push({
                 'remark': _remark,
@@ -77,17 +79,18 @@ $(function() {
                 'manufacturer': _manufacturer,
                 'dev': _dev,
                 'supply': _supply,
-                'instrument': _id
+                'instrument': _id,
+                'service_id': _service_id
             })
         })
 
         var _pid_dwg = $form.find('.js_pid_dwg').val();
         var _loop_no = $form.find('.js_loop_no').val();
         var _id = $form.find('.js-id-instrument_index').val();
-        var _service_id = $form.find('.js-service_id').val();
         var _area_id = $form.find('.js-area_id').val();
         var _ticket_number = $form.find('.js-ticket').val();
 
+        console.log(_devices)
         $.ajax({
             url: '/instrument-index/update', // TODO: replace with your actual Laravel route
             type: 'POST',
@@ -96,7 +99,6 @@ $(function() {
                 'id'  : _id,
                 'loop_no': _loop_no,
                 'devices' : _devices,
-                'service_id' : _service_id,
                 'area' : _area_id,
                 'ticket_number' : _ticket_number
             },
@@ -141,6 +143,13 @@ $(function() {
     });
 
 
+    function getServices(){
+        return $.ajax({
+            url: '/getServices',
+            type: 'GET',
+            dataType: 'json',
+        })
+    }
     function getDataDev(){
         return $.ajax({
             'url' : '/getDataDev',
@@ -168,15 +177,16 @@ $(function() {
             getDataDev(),
             getDataSetting('OUTSIGNAL'),
             getDataSetting('MANUFACTURER'),
-            getDataSetting('SUPPLY')// pass the type you want to fetch
-        ]).then(function([devData, outSignalData, manufacturer, supply]) {
+            getDataSetting('SUPPLY'),
+            getServices()// pass the type you want to fetch
+        ]).then(function([devData, outSignalData, manufacturer, supply, services]) {
             var data = {
                 devOptions: devData,
                 outSignalOptions: outSignalData,
                 manufacturer: manufacturer,
-                supply: supply
+                supply: supply,
+                services: services,
             };
-            console.log(outSignalData, devData);
             var _temp = Mustache.render(_template, data);
             $('.js-temp-dev-here').append(_temp);
         });

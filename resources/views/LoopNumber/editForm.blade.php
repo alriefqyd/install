@@ -49,16 +49,9 @@
                                 <!-- Device Info -->
 
                                     <fieldset>
-                                        <legend>Loop No & Service</legend>
+                                        <legend>Loop No</legend>
                                         <div class="form-group">
                                             <div class="form-field"><label for="loop_no">Loop No</label><input type="text" class="js_loop_no" name="loop_no" value="{{$idx['loop_number']}}"/></div>
-                                            <div class="form-field"><label for="service">Service</label>
-                                                <select name="service_id" class="js-service_id w-full px-4 py-2 border border-teal-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
-                                                    @foreach($services as $a)
-                                                        <option {{$a->id == $instrumentIndex->services_id ? 'selected' : ''}} value="{{$a->id}}">{{$a->name}}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
                                             <div class="form-field"><label for="pid_dwg">P&ID Drawing</label><input type="text" class="js_pid_dwg" value="{{$instrumentIndex->instruments[0]?->pid_drawing ?? ""}}" name="pid_dwg" /></div>
                                         </div>
                                     </fieldset>
@@ -71,6 +64,14 @@
                                         <div class="float-end m-2 text-red-500"><button class="js-btn-delete-dev-info">Delete</button></div>
                                         <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
                                             <div class="form-group">
+                                                <div class="form-field"><label for="service">Service</label>
+                                                    <select name="service_id" class="js-service_id w-full px-4 py-2 border border-teal-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+                                                        @foreach($services as $a)
+                                                            <option {{$a->id == $instrument->service_id ? 'selected' : ''}} value="{{$a->id}}">{{$a->name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="form-field">
                                                 <label class="float-left" for="dev">DEV</label>
                                                 <select name="dev" id="#mySelect"
                                                         class="js-select-dev w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -81,6 +82,7 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
+                                                </div>
                                                 <div class="form-field"><label for="device_descrp">Device Description</label><input type="text" class="js_device_descrp" value="{{$instrument->device_description}}" name="device_descrp" /></div>
                                                 <div class="form-field"><label for="manufacturer">Manufacturer</label>
                                                     <select class="js_manufacturer w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" name="manufacturer">

@@ -69,7 +69,7 @@ class LoopNumberRequestController extends Controller
                 }
                 $instrumentIndex->pid_drawing = $request->pid_drawing;
                 $instrumentIndex->loop_number = $request->loop_no;
-                $instrumentIndex->service_id = $request->service_id;
+                $instrumentIndex->service_id = $device['service_id'];
                 $instrumentIndex->area_id = $request->area;
                 $instrumentIndex->device_description = $device['device_descrp'];
                 $instrumentIndex->manufacturer = $device['manufacturer'];
@@ -176,6 +176,11 @@ class LoopNumberRequestController extends Controller
     public function getDataSetting(Request $request)
     {
         $data = Setting::where('setting_type',$request->type)->get();
+        return response()->json($data);
+    }
+
+    public function getServices(){
+        $data = Service::all();
         return response()->json($data);
     }
 

@@ -11,5 +11,6 @@ Route::get('/request-loop-no/success',[\App\Http\Controllers\LoopNumberRequestCo
 Route::get('/update-instrument-index/{sessionId}',[\App\Http\Controllers\LoopNumberRequestController::class,'edit']);
 Route::get('/getDataDev',[\App\Http\Controllers\LoopNumberRequestController::class,'getDataDev']);
 Route::get('/getDataSetting',[\App\Http\Controllers\LoopNumberRequestController::class,'getDataSetting']);
+Route::get('/getServices',[\App\Http\Controllers\LoopNumberRequestController::class,'getServices']);
 Route::post('/instrument-index/update',[\App\Http\Controllers\LoopNumberRequestController::class,'update']);
 Route::post('/finalize-instrument-index',[\App\Http\Controllers\LoopNumberRequestController::class,'finalize']);

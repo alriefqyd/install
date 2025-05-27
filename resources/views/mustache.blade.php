@@ -4,6 +4,15 @@
         <div class="float-end m-2 text-red-500"><button class="js-btn-delete-dev-info">Delete</button></div>
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
             <div class="form-group">
+                <div class="form-field"><label for="service">Service</label>
+                    <select name="service" id="#mySelect"
+                        class="js-service_id w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        required>
+                    @{{#services}}
+                        <option value="@{{id}}" data-description="@{{name}}" @{{#selected}}selected@{{/selected}}>@{{name}}</option>
+                    @{{/services}}
+                </select>
+                </div>
                 <label for="dev">DEV</label>
                 <select name="dev" id="#mySelect"
                         class="js-select-dev w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"

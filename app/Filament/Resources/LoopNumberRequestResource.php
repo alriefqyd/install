@@ -7,8 +7,10 @@ use App\Filament\Resources\LoopNumberRequestResource\RelationManagers;
 use App\Models\Area;
 use App\Models\DevModel;
 use App\Models\Engineers;
+use App\Models\InstrumentIndex;
 use App\Models\LoopNumberRequest;
 use App\Models\Service;
+use App\Services\InstrumentIndexService;
 use Faker\Core\File;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -29,15 +31,57 @@ class LoopNumberRequestResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Select::make('area_id')->options(function (){
-                return Area::where('type','SUB_AREA')->pluck('name', 'id');
-            })->label('Sub Area'),
+            Forms\Components\Placeholder::make('p_and_id_document_link')
+                ->label('P&ID Document')
+                ->content(function ($get, $set, ?\App\Models\LoopNumberRequest $record) {
+                    if ($record && $record->p_and_id_document) {
+                        $url = asset('storage/' . $record->p_and_id_document);
+                        return new HtmlString('<a href="' . $url . '" target="_blank" rel="noopener noreferrer">Download current file</a>');
+                    }
+                    return 'No file uploaded';
+                }),
+            Forms\Components\Placeholder::make('hmi_document_link')
+                ->label('HMI Document')
+                ->content(function ($get, $set, ?\App\Models\LoopNumberRequest $record) {
+                    if ($record && $record->hmi_document) {
+                        $url = asset('storage/' . $record->hmi_document);
+                        return new HtmlString('<a href="' . $url . '" target="_blank" rel="noopener noreferrer">Download current file</a>');
+                    }
+                    return 'No file uploaded';
+                }),
+            Forms\Components\Select::make('area_id')
+                ->label('Area')
+                ->options(function () {
+                    return Area::where('type', 'SUB_AREA')->pluck('name', 'id');
+                })
+                ->reactive()
+                ->afterStateHydrated(function (callable $set, $state) {
+                    // This will run on initial load
+                    if ($state) {
+                        $areaCode = Area::find($state)?->code;
+                        if ($areaCode) {
+                            $set('loop_number', [
+                                ['loop_number' => $areaCode]
+                            ]);
+                        }
+                    }
+                })
+                ->afterStateUpdated(function (callable $set, $state) {
+                    // This will run when area is changed
+                    $areaCode = Area::find($state)?->code;
+                    if ($areaCode) {
+                        $set('loop_number', [
+                            ['loop_number' => $areaCode]
+                        ]);
+                    }
+                }),
+
             Forms\Components\Select::make('engineers_id')
                 ->label('Engineer')
                 ->options(function () {
                     return Engineers::all()->pluck('name', 'id');
                 })->searchable()->columnSpan('full'),
-            Forms\Components\FileUpload::make('p_and_id_document')
+            /*Forms\Components\FileUpload::make('p_and_id_document')
                 ->disk('public')
                 ->directory('documents/requests')
                 ->getUploadedFileNameForStorageUsing(function ($file) {
@@ -54,25 +98,7 @@ class LoopNumberRequestResource extends Resource
                     $extension = $file->getClientOriginalExtension(); // extension only
 
                     return $originalName . '_' . uniqid() . '.' . $extension;
-                }),
-            Forms\Components\Placeholder::make('p_and_id_document_link')
-                ->label('P&ID Document')
-                ->content(function ($get, $set, ?\App\Models\LoopNumberRequest $record) {
-                    if ($record && $record->p_and_id_document) {
-                        $url = asset('storage/' . $record->p_and_id_document);
-                        return new HtmlString('<a href="' . $url . '" target="_blank" rel="noopener noreferrer">Download current file</a>');
-                    }
-                    return 'No file uploaded';
-                }),
-            Forms\Components\Placeholder::make('hmi_document_link')
-                ->label('Download HMI Document')
-                ->content(function ($get, $set, ?\App\Models\LoopNumberRequest $record) {
-                    if ($record && $record->hmi_document) {
-                        $url = asset('storage/' . $record->hmi_document);
-                        return new HtmlString('<a href="' . $url . '" target="_blank" rel="noopener noreferrer">Download current file</a>');
-                    }
-                    return 'No file uploaded';
-                }),
+                }),*/
             Forms\Components\Radio::make('status')->options([
                 'approve' => 'Approve',
                 'reject' => 'Reject',
@@ -87,17 +113,40 @@ class LoopNumberRequestResource extends Resource
                 ])->searchable()->multiple()
                 ->required(fn ($get) => $get('status') === 'reject')
                 ->visible(fn ($get) => $get('status') === 'reject'),
-            Forms\Components\Select::make('services_id')->options(function () {
+            /*Forms\Components\Select::make('services_id')->options(function () {
                 return Service::all()->pluck('name', 'id');
             })->searchable()->columnSpan('full')
                 ->required(fn ($get) => $get('status') === 'approve')
-                ->visible(fn ($get) => $get('status') === 'approve'),
+                ->visible(fn ($get) => $get('status') === 'approve'),*/
             Forms\Components\Repeater::make('loop_number')
+                ->label('Loop Number')
+                ->defaultItems(1)
+                ->createItemButtonLabel('Add Loop Number')
+                ->afterStateHydrated(function (callable $get, callable $set) {
+                    $areaId = $get('area_id');
+                    if ($areaId) {
+                        $areaCode = \App\Models\Area::find($areaId)?->code;
+                        if ($areaCode) {
+                            $current = $get('loop_number');
+                            if (empty($current)) {
+                                $set('loop_number', [
+                                    ['loop_number' => $areaCode],
+                                ]);
+                            }
+                        }
+                    }
+                })
                 ->schema([
-                    TextInput::make('loop_number')->required(),
-                ])->defaultItems(2)->columnSpan('full')
+                    Forms\Components\TextInput::make('loop_number')
+                        ->label('Loop Number')
+                        ->default(function ($get) {
+                            $areaId = $get('../../area_id'); // Navigate back to root state
+                            return \App\Models\Area::find($areaId)?->code;
+                        }),
+                ])
+                ->columns(1)
                 ->required(fn ($get) => $get('status') === 'approve')
-                ->visible(fn ($get) => $get('status') === 'approve')
+                ->visible(fn ($get) => $get('status') === 'approve')->columnSpanFull()
         ]);
 
     }

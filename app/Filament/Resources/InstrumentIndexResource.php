@@ -128,7 +128,7 @@ class InstrumentIndexResource extends Resource
                 Tables\Columns\TextColumn::make('loop_drwg')->label('Loop Drawing'),
                 Tables\Columns\TextColumn::make('spec_no')->label('Spec No'),
                 Tables\Columns\TextColumn::make('po_mr_no')->label('PR / MR No'),
-                Tables\Columns\TextColumn::make('remark')->label('Remark'),
+                Tables\Columns\TextColumn::make('remark')->label('Remark')->inline()->disableClick(),  // prevent navigation on row click// remove or limit actions if needed
                 Tables\Columns\TextColumn::make('status_updated')->label('Status'),
             ])
             ->filters([
