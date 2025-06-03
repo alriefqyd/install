@@ -14,3 +14,6 @@ Route::get('/getDataSetting',[\App\Http\Controllers\LoopNumberRequestController:
 Route::get('/getServices',[\App\Http\Controllers\LoopNumberRequestController::class,'getServices']);
 Route::post('/instrument-index/update',[\App\Http\Controllers\LoopNumberRequestController::class,'update']);
 Route::post('/finalize-instrument-index',[\App\Http\Controllers\LoopNumberRequestController::class,'finalize']);
+
+Route::get('/import',[\App\Http\Controllers\ImportController::class,'index'])->middleware("auth");
+Route::post('/import',[\App\Http\Controllers\ImportController::class,'import'])->middleware("auth");

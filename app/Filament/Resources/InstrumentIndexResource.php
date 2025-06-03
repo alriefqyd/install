@@ -115,6 +115,7 @@ class InstrumentIndexResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('areas.name')->label('Area')->hidden(),
                 Tables\Columns\TextColumn::make('dev'),
                 Tables\Columns\TextColumn::make('code')->label('Loop No'),
                 Tables\Columns\TextColumn::make('services.name')->label('Service'),
@@ -148,6 +149,7 @@ class InstrumentIndexResource extends Resource
                                 fn ($query, $value) => $query->where('ticket_number', 'like', "%{$value}%")
                             );
                     }),
+                Tables\Filters\SelectFilter::make('area_id')->options(\App\Models\Area::where('type', 'SUB_AREA')->pluck('name', 'id'))->label('Area'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
