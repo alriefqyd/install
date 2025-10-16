@@ -26,7 +26,7 @@ class LoopNumberRequestResource extends Resource
 {
     protected static ?string $model = LoopNumberRequest::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-arrow-path';
 
     public static function form(Form $form): Form
     {
@@ -80,7 +80,7 @@ class LoopNumberRequestResource extends Resource
                 ->label('Engineer')
                 ->options(function () {
                     return Engineers::all()->pluck('name', 'id');
-                })->searchable()->columnSpan('full'),
+                })->searchable()->disabled(),
             /*Forms\Components\FileUpload::make('p_and_id_document')
                 ->disk('public')
                 ->directory('documents/requests')

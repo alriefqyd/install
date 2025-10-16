@@ -23,7 +23,7 @@ class InstrumentIndexResource extends Resource
 {
     protected static ?string $model = InstrumentIndex::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
     public static function form(Form $form): Form
     {
@@ -116,21 +116,21 @@ class InstrumentIndexResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('areas.name')->label('Area')->hidden(),
-                Tables\Columns\TextColumn::make('dev'),
-                Tables\Columns\TextColumn::make('code')->label('Loop No'),
-                Tables\Columns\TextColumn::make('services.name')->label('Service'),
-                Tables\Columns\TextColumn::make('pid_drawing')->label('P&ID Drawing'),
+                Tables\Columns\TextColumn::make('dev')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('code')->label('Loop No')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('services.name')->label('Service')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('pid_drawing')->label('P&ID Drawing')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('device_description')->label('Device Description'),
-                Tables\Columns\TextColumn::make('manufacturer')->label('Manufacturer'),
-                Tables\Columns\TextColumn::make('model')->label('Model/Element Type'),
-                Tables\Columns\TextColumn::make('range_unit')->label('Range Unit'),
-                Tables\Columns\TextColumn::make('outsignal')->label('Outsignal'),
-                Tables\Columns\TextColumn::make('supply')->label('Supply'),
-                Tables\Columns\TextColumn::make('loop_drwg')->label('Loop Drawing'),
-                Tables\Columns\TextColumn::make('spec_no')->label('Spec No'),
-                Tables\Columns\TextColumn::make('po_mr_no')->label('PR / MR No'),
+                Tables\Columns\TextColumn::make('manufacturer')->label('Manufacturer')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('model')->label('Model/Element Type')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('range_unit')->label('Range Unit')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('outsignal')->label('Outsignal')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('supply')->label('Supply')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('loop_drwg')->label('Loop Drawing')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('spec_no')->label('Spec No')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('po_mr_no')->label('PR / MR No')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('remark')->label('Remark')->inline()->disableClick(),  // prevent navigation on row click// remove or limit actions if needed
-                Tables\Columns\TextColumn::make('status_updated')->label('Status'),
+                Tables\Columns\TextColumn::make('status_updated')->label('Status')->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status_updated')->options([

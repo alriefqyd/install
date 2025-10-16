@@ -20,7 +20,7 @@ class AreaResource extends Resource
 {
     protected static ?string $model = Area::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-map';
 
     public static function form(Form $form): Form
     {
@@ -44,22 +44,67 @@ class AreaResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('code'),
-                TextColumn::make('type'),
-                TextColumn::make('parent_id'),
+                TextColumn::make('name')
+                    ->label('Name')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('code')
+                    ->label('Code')
+                    ->searchable(),
+
+                TextColumn::make('type')
+                    ->label('Type')
+                    ->badge() // 💡 make it look like a colored tag
+                    ->color(fn (string $state): string => match ($state) {
+                        'AREA' => 'success',
+                        'ZONE' => 'info',
+                        'SECTION' => 'warning',
+                        default => 'gray',
+                    }),
+
+                TextColumn::make('parent.name')
+                    ->label('Parent Area')
+                    ->placeholder('-'),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('type')
+                    ->label('Area Type')
+                    ->options(
+                        \App\Models\Area::query()
+                            ->whereNotNull('type')
+                            ->distinct()
+                            ->pluck('type', 'type')
+                            ->toArray()
+                    )
+                    ->indicator('Type'),
+
+                Tables\Filters\SelectFilter::make('parent_id')
+                    ->label('Parent Area')
+                    ->options(
+                        \App\Models\Area::whereNull('parent_id')->pluck('name', 'id')->toArray()
+                    )
+                    ->indicator('Parent'),
+
+                Tables\Filters\TernaryFilter::make('is_parent')
+                    ->label('Parent Level')
+                    ->trueLabel('Parent Only')
+                    ->falseLabel('Sub-area Only')
+                    ->placeholder('All')
+                    ->queries(
+                        true: fn ($query) => $query->whereNull('parent_id'),
+                        false: fn ($query) => $query->whereNotNull('parent_id'),
+                    ),
+//                Tables\Filters\TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->filtersLayout(Tables\Enums\FiltersLayout::Dropdown) // 💡 open filters inside modal for modern look
+            ->filtersTriggerAction(fn ($action) => $action
+                ->button()
+                ->label('Filter')
+                ->icon('heroicon-o-funnel')
+                ->color('success') // green button
+            )
+            ->defaultSort('name');
     }
 
     public static function getRelations(): array
