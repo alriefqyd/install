@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListInstrumentIndices extends ListRecords
 {
     protected static string $resource = InstrumentIndexResource::class;
+    protected static ?string $title = 'Instrument Index';
 
     protected function getHeaderActions(): array
     {

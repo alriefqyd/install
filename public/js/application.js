@@ -199,6 +199,24 @@ $(function() {
         _parent.remove();
     })
 
+    $(document).on('click', '.js-btn-duplicate-dev-info', function (e) {
+        e.preventDefault();
+
+        // Find the current fieldset
+        var _this = $(this);
+        var _parent = _this.closest('fieldset');
+
+        // Clone it (with values)
+        var clone = _parent.clone(true, true);
+
+        // Optionally: change something to distinguish the clone
+        // For example, remove or change an ID if needed
+        clone.find('input[type="hidden"].js-id-instrument').val(''); // optional if you don't want same ID
+
+        // Append the cloned fieldset after the original
+        _parent.after(clone);
+    });
+
     $(document).on('click','#finalizeInstrumentIndex', function (e) {
         e.preventDefault();
         var _this = $(this)

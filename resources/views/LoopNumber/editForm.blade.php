@@ -62,6 +62,7 @@
                                         <legend>Device Info</legend>
                                         <input type="hidden" value="{{$instrument->id}}" class="js-id-instrument">
                                         <div class="float-end m-2 text-red-500"><button class="js-btn-delete-dev-info">Delete</button></div>
+                                        <div class="float-end m-2 text-green-500"><button class="js-btn-duplicate-dev-info">Duplicate</button></div>
                                         <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
                                             <div class="form-group">
                                                 <div class="form-field"><label for="service">Service</label>
