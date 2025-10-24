@@ -85,6 +85,7 @@ class LoopNumberRequestController extends Controller
                 $instrumentIndex->code = $request->loop_no;
                 $instrumentIndex->loop_number_requests_id = $request->id;
                 $instrumentIndex->ticket_number = $request->ticket_number;
+                $instrumentIndex->others_service = $device['others_service'] ?? null;
                 $instrumentIndex->save();
             }
 
@@ -101,26 +102,41 @@ class LoopNumberRequestController extends Controller
 
     public function edit(Request $request)
     {
-        $loopNumberRequest = LoopNumberRequest::with(['areas','instruments'])->where('session_id', $request->sessionId)->first();
-        $loopNumbers = $loopNumberRequest->loop_number;
-        $service = Service::all();
-        $dev = DevModel::all();
-        $area = Area::where('type','AREA')->get();
-        $subArea = Area::where('type','SUB_AREA')->get();
-        $manufacturer = Setting::where('setting_type','MANUFACTURER')->get();
-        $outsignal = Setting::where('setting_type','OUTSIGNAL')->get();
-        $supplies = Setting::where('setting_type','SUPPLY')->get();
-        return view('LoopNumber.editForm', [
-            'instrumentIndex' => $loopNumberRequest,
-            'loopNumbers' => $loopNumbers,
-            'services' => $service,
-            'dev' => $dev,
-            'area' => $area,
-            'subArea' => $subArea,
-            'manufacturer' => $manufacturer,
-            'outsignal' => $outsignal,
-            'supplies' => $supplies,
-        ]);
+        try {
+            $loopNumberRequest = LoopNumberRequest::with(['areas','instruments'])->where('session_id', $request->sessionId)->first();
+            if (isset($loopNumberRequest?->instruments[0]) && $loopNumberRequest?->instruments[0]->is_finalize) {
+                return response()->view('instrumentIndex.error-edit', [
+                    'message' => 'Oops! Your data has already been finalized. Please wait for the reviewer to review your submission.',
+                ], 403);
+            }
+            $loopNumbers = $loopNumberRequest->loop_number;
+            $service = Service::all();
+            $dev = DevModel::all();
+            $area = Area::where('type','AREA')->get();
+            $subArea = Area::where('type','SUB_AREA')->get();
+            $manufacturer = Setting::where('setting_type','MANUFACTURER')->get();
+            $outsignal = Setting::where('setting_type','OUTSIGNAL')->get();
+            $supplies = Setting::where('setting_type','SUPPLY')->get();
+            return view('LoopNumber.editForm', [
+                'instrumentIndex' => $loopNumberRequest,
+                'loopNumbers' => $loopNumbers,
+                'services' => $service,
+                'dev' => $dev,
+                'area' => $area,
+                'subArea' => $subArea,
+                'manufacturer' => $manufacturer,
+                'outsignal' => $outsignal,
+                'supplies' => $supplies,
+            ]);
+        } catch (Exception $e) {
+            Log::error('Edit LoopNumberRequest failed: '.$e->getMessage());
+
+            return response()->view('error', [
+                'message' => 'Oops! Something went wrong while loading your request.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+
     }
 
     public function finalize(Request $request){

@@ -10,7 +10,7 @@ class InstrumentIndex extends Model
 
     public function loopNumberRequest()
     {
-        return $this->hasOne(LoopNumberRequest::class,'loop_number_request_id','id');
+        return $this->hasOne(LoopNumberRequest::class,'id','loop_number_requests_id');
     }
 
     public function areas(){
