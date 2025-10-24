@@ -1,10 +1,10 @@
 $(function() {
-    $(document).ready(function() {
-        $('.mySelect').select2({
-            search:true,
-            width: '100%' // makes it responsive
-        });
+    $('.mySelect').select2({
+        search:true,
+        width: '100%' // makes it responsive
     });
+
+    console.log($('.mySelect').length);
 
     $.ajaxSetup({
         headers: {
@@ -65,6 +65,7 @@ $(function() {
             var _supply = __parent.find('.js-supply').val();
             var _id = __parent.find('.js-id-instrument').val();
             var _service_id = __parent.find('.js-service_id').val();
+            var _other_service = __parent.find('.js_other_service').val();
 
 
             _devices.push({
@@ -80,7 +81,8 @@ $(function() {
                 'dev': _dev,
                 'supply': _supply,
                 'instrument': _id,
-                'service_id': _service_id
+                'service_id': _service_id,
+                'others_service': _other_service,
             })
         })
 
@@ -171,15 +173,19 @@ $(function() {
 
     $(document).on('click', '#add-dev-btn', function (e) {
         e.preventDefault();
-        var _this = $(this)
-        var _template = $('#js-template-device-info').html()
+
+        var _this = $(this);
+        var _template = $('#js-template-device-info').html();
+
+        _this.find('svg').removeClass('hidden');
+        _this.attr('disabled','disabled');
         Promise.all([
             getDataDev(),
             getDataSetting('OUTSIGNAL'),
             getDataSetting('MANUFACTURER'),
             getDataSetting('SUPPLY'),
-            getServices()// pass the type you want to fetch
-        ]).then(function([devData, outSignalData, manufacturer, supply, services]) {
+            getServices()
+        ]).then(function ([devData, outSignalData, manufacturer, supply, services]) {
             var data = {
                 devOptions: devData,
                 outSignalOptions: outSignalData,
@@ -187,10 +193,32 @@ $(function() {
                 supply: supply,
                 services: services,
             };
+
             var _temp = Mustache.render(_template, data);
-            $('.js-temp-dev-here').append(_temp);
+            var $newContent = $(_temp);
+
+            // Append the new HTML
+            $('.js-temp-dev-here').append($newContent);
+            _this.find('svg').addClass('hidden');
+            _this.removeAttr('disabled');
+            // Initialize Select2 *after* appending
+            $newContent.find('.mySelect').select2({
+                width: '100%',
+            });
         });
-    })
+    });
+
+    $(document).on('change', '.js-service_id', function (e) {
+       var _this = $(this);
+       var _selected = _this.find(':selected').text();
+       if( _selected == 'OTHERS'){
+              _this.closest('fieldset').find('.js-service-other-container').removeClass('hidden');
+       } else {
+            _this.closest('fieldset').find('.js-service-other-container').addClass('hidden');
+            _this.closest('fieldset').find('.js_other_service').val('');
+       }
+    });
+
 
     $(document).on('click', '.js-btn-delete-dev-info', function (e) {
         e.preventDefault();
@@ -234,6 +262,9 @@ $(function() {
                 _loading.addClass('hidden');
                 $('#success-modal').removeClass('hidden');
                 _this.attr('disabled', false);
+                setTimeout(function (){
+                    window.location.href = '/instrument-index/success';
+                },500);
             }
         })
     })

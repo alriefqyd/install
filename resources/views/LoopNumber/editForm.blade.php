@@ -66,16 +66,22 @@
                                         <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
                                             <div class="form-group">
                                                 <div class="form-field"><label for="service">Service</label>
-                                                    <select name="service_id" class="js-service_id w-full px-4 py-2 border border-teal-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+                                                    <select name="service_id" class="mySelect js-service_id w-full px-4 py-2 border border-teal-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+                                                        <option value="">Select Service</option>
                                                         @foreach($services as $a)
                                                             <option {{$a->id == $instrument->service_id ? 'selected' : ''}} value="{{$a->id}}">{{$a->name}}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
+
+                                                <div class="form-field js-service-other-container {{!isset($instrument->others_service) ? 'hidden' : '' }}">
+                                                    <label for="other_service">Other Service</label>
+                                                    <input type="text" class="js_other_service" value="{{$instrument->others_service}}" name="other_service" />
+                                                </div>
                                                 <div class="form-field">
                                                 <label class="float-left" for="dev">DEV</label>
-                                                <select name="dev" id="#mySelect"
-                                                        class="js-select-dev w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                                <select name="dev"
+                                                        class="mySelect js-select-dev w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                                                         required>
                                                     @foreach($dev as $a)
                                                         <option data-description="{{$a->description}}" {{$a->code == $instrument->dev ? 'selected' : ''}} value="{{$a->code}}">
@@ -119,8 +125,29 @@
                                 </span>
                                 <fieldset>
                                     <div class="mt-4">
-                                        <button type="button" id="add-dev-btn" class="px-2 py-1 rounded-md bg-yellow-500 text-white hover:bg-yellow-600">
+                                        <button type="button" id="add-dev-btn" class="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600">
                                             + Add New Device
+                                            <svg
+                                                id="spinner"
+                                                class="w-4 h-4 animate-spin text-white hidden"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    class="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    stroke-width="4"
+                                                ></circle>
+                                                <path
+                                                    class="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8v8H4z"
+                                                ></path>
+                                            </svg>
                                         </button>
                                     </div>
                                 </fieldset>

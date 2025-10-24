@@ -21,4 +21,9 @@ class InstrumentIndexController extends Controller
             'ticket_number' => $ticketNumber,
         ]));
     }
+
+    public function success()
+    {
+        return view('instrumentIndex.successFinalize');
+    }
 }

@@ -26,6 +26,15 @@ class EditLoopNumberRequest extends EditRecord
         ];
     }
 
+    protected function getFormActions(): array
+    {
+        return [
+            Actions\Action::make('save')
+                ->label('Submit') // 👈 custom label
+                ->submit('save'),
+        ];
+    }
+
     protected function afterSave(): void
     {
         $record = $this->record;
