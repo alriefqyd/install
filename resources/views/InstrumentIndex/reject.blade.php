@@ -24,12 +24,12 @@
                 <tr>
                     <td style="font-size: 16px; color: #444444; padding-bottom: 20px;">
                         Your Instrument Index update has been rejected due to some issues.
-                        Please check the remarks and make the necessary corrections by clicking <a href="{{url('/update-instrument-index/'. $data->loopNumberRequest?->session_id)}}"> here </a>
+                        Please check the remarks and make the necessary corrections by clicking <a href="{{url('/admin/update-instrument-index/'. $data->session_id)}}"> here </a>
                     </td>
                 </tr>
                 <tr>
                     <td style="font-size: 16px; padding-bottom: 30px;">
-                        {{$remark}}
+                        {{$data->remark_updated}}
                     </td>
                 </tr>
                 <tr>

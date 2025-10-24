@@ -6,8 +6,6 @@
     <title>Instrument Engineer Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="{{asset('/assets/select2/dist/css/select2.css')}}" rel="stylesheet" />
-    <link href="{{asset('/css/custom.css')}}" rel="stylesheet" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         fieldset {
@@ -171,7 +169,6 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{asset('/js/application.js')}}"></script>
 <script src="{{asset('/js/mustache.min.js')}}"></script>
-<script src="{{asset('/assets/select2/dist/js/select2.full.js')}}"></script>
 
 <script>
     const toggle = document.getElementById('menuToggle');

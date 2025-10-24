@@ -4,32 +4,25 @@
         <div class="float-end m-2 text-red-500">
             <button class="js-btn-delete-dev-info">Delete</button>
         </div>
-        <div class="float-end m-2 text-green-500"><button class="js-btn-duplicate-dev-info">Duplicate</button></div>
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
             <div class="form-group">
                 <div class="form-field">
                     <label for="service">Service</label>
                     <select
                         name="service"
-                        class="mySelect js-service_id w-full px-4 py-2 border border-teal-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        class="js-service_id w-full px-4 py-2 border border-teal-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                         required>
-                         <option value="">Select Dev</option>
                         @{{#services}}
                             <option value="@{{id}}" data-description="@{{name}}" @{{#selected}}selected@{{/selected}}>@{{name}}</option>
                         @{{/services}}
                     </select>
                 </div>
 
-                <div class="form-field js-service-other-container hidden">
-                    <label for="other_service">Other Service</label>
-                    <input type="text" class="js_other_service" value="" name="others_service" />
-                </div>
-
                 <div class="form-field">
                     <label class="float-left" for="dev">DEV</label>
                     <select
                         name="dev"
-                        class="mySelect js-select-dev w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        class="js-select-dev w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                         required>
                         @{{#devOptions}}
                             <option value="@{{code}}" data-description="@{{description}}" @{{#selected}}selected@{{/selected}}>@{{code}}</option>
@@ -45,7 +38,7 @@
                 <div class="form-field">
                     <label for="manufacturer">Manufacturer</label>
                     <select
-                        class="js_manufacturer mySelect w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        class="js_manufacturer w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                         name="manufacturer">
                         @{{#manufacturer}}
                             <option value="@{{setting_value}}" @{{#selected}}selected@{{/selected}}>@{{setting_value}}</option>
@@ -66,7 +59,7 @@
                 <div class="form-field">
                     <label for="outsignl">Output Signal</label>
                     <select
-                        class="js_outsignl mySelect w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        class="js_outsignl w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                         name="outsignl">
                         @{{#outSignalOptions}}
                             <option value="@{{setting_value}}" @{{#selected}}selected@{{/selected}}>@{{setting_value}}</option>
@@ -77,7 +70,7 @@
                 <div class="form-field w-full">
                     <label for="supply">Supply</label>
                     <select
-                        class="js-supply mySelect w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        class="js-supply w-full px-4 py-2 border border-teal-300 js_dev rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                         name="supply">
                         @{{#supply}}
                             <option value="@{{setting_value}}" @{{#selected}}selected@{{/selected}}>@{{setting_value}}</option>

@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\Engineers;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,17 +9,17 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendApprovedInstrumentIndexMail extends Mailable
+class sendRejectInstrumentIndexMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($data, $ticket)
+    public function __construct($data)
     {
         $this->data = $data;
-        $this->ticket = $ticket;
+        $this->requestor = 'Al';
     }
 
     /**
@@ -29,7 +28,7 @@ class SendApprovedInstrumentIndexMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Instrument Index Approved ['.$this->ticket.']',
+            subject: 'Instrument Index Rejected',
         );
     }
 
@@ -39,10 +38,10 @@ class SendApprovedInstrumentIndexMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'InstrumentIndex.approved',
+            view: 'InstrumentIndex.reject',
             with: [
-                'requestor' => $this->data->loopNumberRequest->engineers->name,
-                'sessionId' => $this->data->loopNumberRequest->sessionId,
+                'data' => $this->data,
+                'requestor' => $this->requestor,
             ]
         );
     }

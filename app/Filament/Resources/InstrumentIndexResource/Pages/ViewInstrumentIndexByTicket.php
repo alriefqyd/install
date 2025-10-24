@@ -3,15 +3,10 @@
 namespace App\Filament\Resources\InstrumentIndexResource\Pages;
 
 use App\Filament\Resources\InstrumentIndexResource;
-use App\Mail\SendApprovedInstrumentIndexMail;
-use App\Mail\SendApprovedLoopNumberMail;
-use App\Mail\SendRejectInstrumentIndexMail;
 use App\Models\InstrumentIndex;
-use App\Models\LoopNumberRequest;
 use Filament\Resources\Pages\Page;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Mail;
 
 class ViewInstrumentIndexByTicket extends Page
 {
@@ -44,36 +39,19 @@ class ViewInstrumentIndexByTicket extends Page
             return;
         }
 
-        $instruments = InstrumentIndex::with('loopNumberRequest.engineers')->where('ticket_number', $this->ticket_number)->get();
-        if ($this->actionType === 'reject'){
-            if (empty($this->rejectionReason)) {
-                Notification::make()
-                    ->title('Rejection reason is required.')
-                    ->danger()
-                    ->send();
-                return;
-            }
-            foreach ($instruments as $instrument) {
-                $instrument->update([
-                    'is_finalize' => false
-                ]);
-            }
-            Mail::to($instruments[0]->loopNumberRequest?->engineers?->email)->send(new SendRejectInstrumentIndexMail($instruments[0], $this->rejectionReason));
-        }
-
-        if($this->actionType === 'approve'){
-            LoopNumberRequest::where('ticket_number', $this->ticket_number)->update([
-                'is_completed' => true
-            ]);
-
-            Mail::to($instruments[0]->loopNumberRequest?->engineers?->email)->send(new SendApprovedInstrumentIndexMail($instruments[0] ,$this->ticket_number));
+        if ($this->actionType === 'reject' && empty($this->rejectionReason)) {
+            Notification::make()
+                ->title('Rejection reason is required.')
+                ->danger()
+                ->send();
+            return;
         }
 
         // Update DB status
         foreach ($this->records as $record) {
             $record->update([
                 'status_updated' => $this->actionType === 'approve' ? 'Approved' : 'Rejected',
-                //'rejection_reason' => $this->actionType === 'reject' ? $this->rejectionReason : null,
+//                'rejection_reason' => $this->actionType === 'reject' ? $this->rejectionReason : null,
                 'is_finalize' => $this->actionType === 'approve' ? 1 : 0,
             ]);
         }

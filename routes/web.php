@@ -18,7 +18,7 @@ Route::post('/finalize-instrument-index',[\App\Http\Controllers\LoopNumberReques
 Route::get('/instrument-index/import',[\App\Http\Controllers\ImportController::class,'index'])->middleware("auth");
 Route::post('/instrument-index/import',[\App\Http\Controllers\ImportController::class,'import'])->middleware("auth");
 Route::get('/ticket/{ticket_number}', [\App\Http\Controllers\InstrumentIndexController::class, 'viewInstrumentIndexByTicketNumber'])->name('ticket.show');
-Route::get('/instrument-index/success', [\App\Http\Controllers\InstrumentIndexController::class, 'success'])->middleware("auth");
+
 
 Route::get('/service/import',[\App\Http\Controllers\ImportController::class,'indexService'])->middleware("auth");
 Route::post('/service/import',[\App\Http\Controllers\ImportController::class,'importService'])->middleware("auth");

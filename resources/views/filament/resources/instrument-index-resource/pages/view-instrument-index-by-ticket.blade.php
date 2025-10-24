@@ -33,9 +33,12 @@
                     <thead>
                     <tr class="bg-primary-600 text-white">
                         <th class="px-6 py-3 text-left text-sm font-semibold">#</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Tag No.</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold">Code</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold">Device Description</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold">Service</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold">Area</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold">PID Drawing</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold">Loop Drawing</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold">Status</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold">Created At</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold">Actions</th>
@@ -46,8 +49,11 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-3 text-gray-700">{{ $index + 1 }}</td>
                             <td class="px-6 py-3 text-gray-700">{{ $item->dev . '-' . $item->code }}</td>
+                            <td class="px-6 py-3 text-gray-700">{{ $item->device_description ?? '-' }}</td>
                             <td class="px-6 py-3 text-gray-700">{{ $item->services->name ?? '-' }}</td>
                             <td class="px-6 py-3 text-gray-700">{{ $item->areas->name ?? '-' }}</td>
+                            <td class="px-6 py-3 text-gray-700">{{ $item->pid_drawing ?? '-' }}</td>
+                            <td class="px-6 py-3 text-gray-700">{{ $item->loop_drwg ?? '-' }}</td>
                             <td class="px-2 py-3">
                                 <x-filament::badge :color="$item->status_updated == 'Approved' ? 'success' : 'warning'">
                                     {{ $item->status_updated ? $item->status_updated : 'Pending' }}
@@ -99,13 +105,6 @@
                                                 <span class="font-semibold text-gray-600">Service:</span>
                                                 <div class="mt-1 bg-white border border-gray-200 rounded px-3 py-2 shadow-sm">
                                                     {{ $item->services->name ?? '-' }}
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <span class="font-semibold text-gray-600">Other Service:</span>
-                                                <div class="mt-1 bg-white border border-gray-200 rounded px-3 py-2 shadow-sm">
-                                                    {{ $item->others_service ?? '-' }}
                                                 </div>
                                             </div>
 
